@@ -14,10 +14,28 @@ class Blackjack
     @house_hand = Hand.new
   end
 
-  def display(array)
-    array.each do |card|
-      print "#{@value}#{@suit} "
+  def player_hand_display
+    string = ""
+    player_hand.cards.each do |card|
+      string << card.value
+      string << card.suit
+      string << " "
     end
+    string
+  end
+
+  def house_hand_display
+    string = ""
+    house_hand.cards.each do |card|
+      string << card.value
+      string << card.suit
+      string << " "
+    end
+    string
+  end
+
+  def end_game
+    print "#{player_hand_display}, totaling #{player_hand.sum_value} and the house has #{house_hand_display}, totaling #{house_hand.sum_value}"
   end
 
   def new_game
@@ -32,10 +50,7 @@ class Blackjack
     house_hand.cards << deck.deal
 
     puts "\nWelcome to Blackjack!"
-    player_hand.cards.each do |card|
-      puts "Player was dealt #{card.value} #{card.suit}"
-    end
-    puts "Player score: " + player_hand.sum_value.to_s
+    puts "Player was dealt #{player_hand_display}"
     puts "Your hand total is #{player_hand.sum_value}, would you like to hit or stand?"
     decision = gets.chomp.downcase
     until decision == "hit" || decision == "stand"
@@ -46,15 +61,24 @@ class Blackjack
       hit
     elsif decision == "stand"
       if player_hand.sum_value > house_hand.sum_value && house_hand.sum_value > 16
-        print "You have #{player_hand.card_display} and the house has #{house_hand.card_display}, you win!"
-      elsif player_hand.sum_value <= house_hand.sum_value && house_hand.sum_value > 16
-        print "You have #{player_hand.card_display} and the house has #{house_hand.card_display}, house wins!"
+        end_game
+        print "\n YOU WIN!\n"
+      elsif player_hand.sum_value < house_hand.sum_value && house_hand.sum_value > 16
+        end_game
+        print "\n HOUSE WINS!\n"
+      elsif player_hand.sum_value == house_hand.sum_value && house_hand.sum_value > 16
+        end_game
+        print "\n PUSH!\n"
       else
         stand
       end
     end
     puts "\nWould you like to play again? (Yes/No)"
     new_round = gets.chomp.downcase
+    until new_round == "yes" || new_round == "no"
+      puts "Please say yes or no"
+      new_round = gets.chomp.downcase
+    end
     if new_round == "yes"
       player_hand.cards = []
       house_hand.cards = []
@@ -71,18 +95,20 @@ class Blackjack
   def hit
     player_hand.cards << deck.deal
     if player_hand.sum_value > 21
-    print "Your total is #{player_hand.sum_value}, you bust!"
+    print "You have #{player_hand_display}. Your total is #{player_hand.sum_value}\n YOU BUST!"
     else
-    puts "Your hand total is now #{player_hand.sum_value}, would you like to hit or stand?"
+    puts "You have #{player_hand_display}. Your hand total is now #{player_hand.sum_value}, would you like to hit or stand?"
     decision = gets.chomp.downcase
       if decision == "hit"
         hit
       else
         puts "Player score: " + player_hand.sum_value.to_s
         if player_hand.sum_value > house_hand.sum_value && house_hand.sum_value > 16
-          print "You have #{player_hand.card_display} and the house has #{house_hand.card_display}, you win!"
+          end_game
+          print "\n YOU WIN!\n"
         elsif player_hand.sum_value <= house_hand.sum_value && house_hand.sum_value > 16
-          print "You have #{player_hand.card_display} and the house has #{house_hand.card_display}, house wins!"
+          end_game
+          print "\n HOUSE WINS!\n"
         else
           stand
         end
@@ -91,16 +117,22 @@ class Blackjack
   end
 
   def stand
-    print "\nYou have #{display(player_hand.card_display)} and the house has #{house_hand.card_display}, house will hit \n\n"
+    print "\nYou have #{(player_hand_display)} and the house has #{house_hand_display}, house will hit \n\n"
     print "Press enter for next card flip \n"
     gets.chomp
     house_hand.cards << deck.deal
     if player_hand.sum_value < house_hand.sum_value && house_hand.sum_value <= 21
-      print "You have #{player_hand.card_display}, totaling #{player_hand.sum_value} and the house has #{house_hand.card_display}, totaling #{house_hand.sum_value}, house wins!"
+      end_game
+      print "\n HOUSE WINS!\n"
     elsif house_hand.sum_value > 21
-      print "You have #{player_hand.card_display}, totaling #{player_hand.sum_value} and the house has #{house_hand.card_display}, totaling #{house_hand.sum_value}, house busts, you win!"
+      end_game
+      print "\n HOUSE BUSTS\n YOU WIN!\n"
     elsif 16 < house_hand.sum_value && house_hand.sum_value <= 21 && player_hand.sum_value > house_hand.sum_value
-      print "You have #{player_hand.card_display}, totaling #{player_hand.sum_value} and the house has #{house_hand.card_display}, totaling #{house_hand.sum_value}, you win!"
+      end_game
+      print "\n YOU WIN!\n"
+    elsif 16 < house_hand.sum_value && house_hand.sum_value <= 21 && player_hand.sum_value == house_hand.sum_value
+      end_game
+      print "\n PUSH!\n"
     else
       stand
     end

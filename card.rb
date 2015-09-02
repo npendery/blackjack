@@ -1,4 +1,3 @@
-# require_relative "deck"
 require_relative "hand"
 require "pry"
 
@@ -14,4 +13,7 @@ class Card
     ["J", "Q", "K"].include?(@value)
   end
 
+  def ace?
+    ["A"].include?(@value)
+  end
 end

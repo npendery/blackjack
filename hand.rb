@@ -1,5 +1,4 @@
 require_relative "card"
-# require_relative "deck"
 require "pry"
 
 class Hand
@@ -11,23 +10,23 @@ class Hand
 
   def sum_value
     sum = 0
+    ace_in_hand = false
     @cards.each do |card|
       if card.face_card
         # value == "J" || card.value == "Q" || card.value == "K"
         sum += 10
-      elsif card.value == "A"
-        sum += 11
+      elsif card.ace?
+        ace_in_hand = true
+        sum += 1
       else
         sum += card.value.to_i
       end
     end
     sum
-  end
-
-  def card_display
-    @cards.each do |card|
-      print "#{card.value}#{card.suit} "
+    if ace_in_hand && sum <= 11
+      sum += 10
     end
+    sum
   end
 
 end
